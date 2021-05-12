@@ -1,0 +1,81 @@
+"""Testing for DNS lookup to speed it up
+"""
+import socket
+import timeit
+
+DNS_TARGETS = [
+    "www.google.com",
+    "www.yahoo.com",
+    "www.msn.com",
+    "www.furaffinity.net",
+    "www.twitter.com",
+    "www.prudential.com",
+    "www.python.org",
+    "www.reddit.com",
+    "www.zoom.com",
+    "www.youtube.com",
+    "www.gmail.com",
+    "www.netflix.com",
+    "www.budgetbytes.com",
+    "app.youneedabudget.com",
+    "www.freelancer.com",
+    "feeds.packetpusher.net",
+    "www.barnesandnoble.com",
+    "www.cisco.com",
+    "portainer.919.home",
+    "www.linuxtechi.com",
+    "www.coursera.com",
+    "www.hotmail.com",
+    "www.apple.com"
+]
+
+
+def with_loop(targets: list):
+    """Search using a plain for-loop
+
+    Args:
+        targets -> list: list of URLs to resolve
+
+    Yields:
+        str: the IP as a string of URL
+    """
+    for _ in targets:
+        yield socket.gethostbyname(_)[0]
+
+
+def with_map(target: str):
+    """Search using map
+
+    Args:
+        target -> str: str of URL to resolve
+
+    Yields:
+        str: the IP as a string of URL
+    """
+    yield socket.gethostbyname(target)[0]
+
+
+def main():
+    """Main method
+
+    Returns:
+        None
+    """
+    setup = '''
+import socket
+from __main__ import with_loop, with_map, DNS_TARGETS
+'''
+    loop_stmt = '[_ for _ in with_loop(DNS_TARGETS)]'
+    map_stmt = '[_ for _ in map(with_map, DNS_TARGETS)]'
+    loop_time = timeit.timeit(setup=setup, stmt=loop_stmt, number=1)
+    map_time = timeit.timeit(setup=setup, stmt=map_stmt, number=1)
+
+    print(f"Loop Time: {loop_time}\nMap Time: {map_time}")
+    if loop_time > map_time:
+        print("Map Time is faster")
+    else:
+        print("Loop Time is faster")
+
+
+if __name__ == '__main__':
+    main()
